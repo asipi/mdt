@@ -19,7 +19,7 @@ Multisite MDT is made up of 3 distinct types of deployment servers.
 
 You can see in the diagram below how these pieces flow together to keep all MDT sites up to date.
 
-![dfs-diagram.png](/.image/dfs-diagram.png)
+![dfs-diagram.png](https://johnafogarty4.github.io/mdt/.image/dfs-diagram.png)
 
 # Check for elevation
 Write-Host "Checking for elevation"
