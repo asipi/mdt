@@ -19,19 +19,8 @@ Multisite MDT is made up of 3 distinct types of deployment servers.
 
 You can see in the diagram below how these pieces flow together to keep all MDT sites up to date.
 
-![dfs-diagram.png](/.image/dfs-diagram.png)
-
-# Check for elevation
-Write-Host "Checking for elevation"
-
-If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
-    [Security.Principal.WindowsBuiltInRole] "Administrator"))
-{
-    Write-Warning "Oupps, you need to run this script from an elevated PowerShell prompt!`nPlease start the PowerShell prompt as an Administrator and re-run the script."
-    Write-Warning "Aborting script..."
-    Break
-}
-
+[![dfs-diagram.png](/.image/dfs-diagram.png)](https://lucid.app/lucidchart/9b876d58-992d-4a1d-8ca1-5d85899975e6/edit?invitationId=inv_92c65d1d-caee-4acb-9009-523605ece512)
+[LucidChart](https://lucid.app/lucidchart/9b876d58-992d-4a1d-8ca1-5d85899975e6/edit?invitationId=inv_92c65d1d-caee-4acb-9009-523605ece512)
 
 # Configuration
 
