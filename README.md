@@ -4,21 +4,14 @@
 
 **Version 1.0**
 
-**Table of Contents**
-
-[[_TOC_]]
-* * *
-
-----
-
-----
 **Revision History**
 | **Date** | **Revision \#** | **Editor** | **Description of Change** |
 |:-----------:|:-----------:|:-----------:|:-----------:|
 | 12/07/2021 | v1.0 | John Fogarty  | Initial Revision |
 
+----
 
-## Overall Architecture
+# Overall Architecture
 Multisite MDT is made up of 3 distinct types of deployment servers.  
 
 1. The DFS primary deployment share
@@ -29,6 +22,7 @@ You can see in the diagram below how these pieces flow together to keep all MDT 
 
 [![dfs-diagram.png](/.image/dfs-diagram.png)](https://lucid.app/lucidchart/9b876d58-992d-4a1d-8ca1-5d85899975e6/edit?invitationId=inv_92c65d1d-caee-4acb-9009-523605ece512)
 
+----
 # Configuration
 
 ## Configure NTFS Permissions for the MDT Build Lab deployment share
