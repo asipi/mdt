@@ -75,7 +75,7 @@ After the script has finished, mount your Windows 2019 DVD to the MDT server and
 * [Microsoft Deployment Toolkit](https://www.microsoft.com/en-us/download/confirmation.aspx?id=54259)
 * Windows Deployment Services (Powershell below)
 ```powershell
-    Install-WindowsFeature wds-deployment -includemanagementtools
+Install-WindowsFeature wds-deployment -includemanagementtools
 ```
 
 
@@ -111,24 +111,24 @@ icacls "$ImageDeploymentShareNTFS\Captures" /grant '"Administrators":(OI)(CI)(M)
 
 ### Deployment Workbench
 
-1. Launch Deployment Workbench
+1. Launch Deployment Workbench\
 ![deployment-workbench.png](/.image/deployment-workbench.png)
-2. Right click on Deployment Shares and choose open Deployment Share
+2. Right click on Deployment Shares and choose open Deployment Share\
 ![dw-open-deployment-share.png](/.image/dw-open-deployment-share.png)
-3. Choose d:\mdt\lii-deploy
+3. Choose d:\mdt\lii-deploy  
 ![dw-deployment-share-path.png](/.image/dw-deployment-share-path.png)
 4. Click Next
 5. Click Finish
-6. Right click the share and choose properties
+6. Right click the share and choose properties\
 ![dw-properties.png](/.image/dw-properties.png)
-7. Update the Network UNC path with your server name.
+7. Update the Network UNC path with your server name.\
 ![dw-unc-path.png](/.image/dw-unc-path.png)
 8. Click the rules tab, and then click Edit Bootstrap.ini
-9. Update DeployRoot value
+9. Update DeployRoot value\
 ![dw-boot.png](/.image/dw-boot.png)
 10. Close and Save file
 11. Click Ok
-12. Right click the share and choose update Deployment share
+12. Right click the share and choose update Deployment share\
 ![dw-update-share.png](/.image/dw-update-share.png)
 13. Click Next
 14. Click Next
@@ -185,22 +185,22 @@ Install-WindowsFeature wds-deployment -includemanagementtools
 
 1. Launch Deployment Workbench\
 ![deployment-workbench.png](/.image/deployment-workbench.png)
-2. Right click on Deployment Shares and choose open Deployment Share  
+2. Right click on Deployment Shares and choose open Deployment Share\
 ![dw-open-deployment-share.png](/.image/dw-open-deployment-share.png)
 3. Choose d:\mdt\lii-deploy  
 ![dw-deployment-share-path.png](/.image/dw-deployment-share-path.png)
 4. Click Next
 5. Click Finish
-6. Right click the share and choose properties  
+6. Right click the share and choose properties\
 ![dw-properties.png](/.image/dw-properties.png)
-7. Update the Network UNC path with your server name.  
+7. Update the Network UNC path with your server name.\
 ![dw-unc-path.png](/.image/dw-unc-path.png)
 8. Click the rules tab, and then click Edit Bootstrap.ini
-9. Update DeployRoot value  
+9. Update DeployRoot value\
 ![dw-boot.png](/.image/dw-boot.png)
 10. Close and Save file
 11. Click Ok
-12. Right click the share and choose update Deployment share  
+12. Right click the share and choose update Deployment share\
 ![dw-update-share.png](/.image/dw-update-share.png)
 13. Click Next
 14. Click Next
