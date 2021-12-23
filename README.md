@@ -183,7 +183,7 @@ Install-WindowsFeature wds-deployment -includemanagementtools
 ```
 ### Deployment Workbench
 
-1. Launch Deployment Workbench  
+1. Launch Deployment Workbench\
 ![deployment-workbench.png](/.image/deployment-workbench.png)
 2. Right click on Deployment Shares and choose open Deployment Share  
 ![dw-open-deployment-share.png](/.image/dw-open-deployment-share.png)
