@@ -179,28 +179,28 @@ Install the following items, if you have run the robocopy you can find these in 
 * [Microsoft Deployment Toolkit](https://www.microsoft.com/en-us/download/confirmation.aspx?id=54259)
 * Windows Deployment Services (Powershell below)
 ```powershell
-    Install-WindowsFeature wds-deployment -includemanagementtools
+Install-WindowsFeature wds-deployment -includemanagementtools
 ```
 ### Deployment Workbench
 
-1. Launch Deployment Workbench
+1. Launch Deployment Workbench  
 ![deployment-workbench.png](/.image/deployment-workbench.png)
-2. Right click on Deployment Shares and choose open Deployment Share
+2. Right click on Deployment Shares and choose open Deployment Share  
 ![dw-open-deployment-share.png](/.image/dw-open-deployment-share.png)
-3. Choose d:\mdt\lii-deploy
+3. Choose d:\mdt\lii-deploy  
 ![dw-deployment-share-path.png](/.image/dw-deployment-share-path.png)
 4. Click Next
 5. Click Finish
-6. Right click the share and choose properties
+6. Right click the share and choose properties  
 ![dw-properties.png](/.image/dw-properties.png)
-7. Update the Network UNC path with your server name.
+7. Update the Network UNC path with your server name.  
 ![dw-unc-path.png](/.image/dw-unc-path.png)
 8. Click the rules tab, and then click Edit Bootstrap.ini
-9. Update DeployRoot value
+9. Update DeployRoot value  
 ![dw-boot.png](/.image/dw-boot.png)
 10. Close and Save file
 11. Click Ok
-12. Right click the share and choose update Deployment share
+12. Right click the share and choose update Deployment share  
 ![dw-update-share.png](/.image/dw-update-share.png)
 13. Click Next
 14. Click Next
@@ -241,7 +241,7 @@ Revoke-SmbShareAccess -Name $DeploymentShare -AccountName "CREATOR OWNER" -Force
 
 Here are all the links I used as reference material as I reverse engineered the previous MDT build as well as planning for a multi-site easily supportable MDT design going forward.
 
-[Windows 10 Deployment with MDT](https://docs.microsoft.com/en-us/windows/deployment/deploy-windows-mdt/prepare-for-windows-deployment-with-mdt) 
-[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image) 
-[Configure MDT](https://mcpmag.com/articles/2018/12/13/configure-wds-using-powershell.aspx) 
-[Hyper-V Lab Setup](https://malwaremily.medium.com/install-ad-ds-dns-and-dhcp-using-powershell-on-windows-server-2016-ac331e5988a7) 
+[Windows 10 Deployment with MDT](https://docs.microsoft.com/en-us/windows/deployment/deploy-windows-mdt/prepare-for-windows-deployment-with-mdt)  
+[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image)   
+[Configure MDT](https://mcpmag.com/articles/2018/12/13/configure-wds-using-powershell.aspx)  
+[Hyper-V Lab Setup](https://malwaremily.medium.com/install-ad-ds-dns-and-dhcp-using-powershell-on-windows-server-2016-ac331e5988a7)  
