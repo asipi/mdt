@@ -2,13 +2,14 @@
 
 **Setting up MDT for Imaging and Deployment**
 
-**Version 1.0**
+**Version 1.2**
 
 **Revision History**
 | **Date** | **Revision \#** | **Editor** | **Description of Change** |
 |:-----------:|:-----------:|:-----------:|:-----------:|
 | 12/07/2021 | v1.0 | John Fogarty  | Initial Revision |
 | 12/17/2021 | v1.1 | John Fogarty  | Additional Documentation |
+| 12/23/2021 | v1.2 | John Fogarty  | Expanded Deployment Workbench steps |
 
 ----
 
@@ -108,15 +109,34 @@ icacls $ImageDeploymentShareNTFS /grant '"SYSTEM":(OI)(CI)(F)'
 icacls "$ImageDeploymentShareNTFS\Captures" /grant '"Administrators":(OI)(CI)(M)'
 ```
 
-## Deployment Workbench
+### Deployment Workbench
 
-Now you should be able to open both Deployment Shares in Deployment Workbench.
-
-Configure each deployment share to point to your computername / IP address in the properties, as well as the bootstrap.ini.  In the monitoring tab, update the hostname with the MDT server you are on.  Once complete, update the deployment share, this will regenerate the boot images.  This is only done in the LAB.  The DFS Shares are handled differently.
+1. Launch Deployment Workbench
+![deployment-workbench.png](/.image/deployment-workbench.png)
+2. Right click on Deployment Shares and choose open Deployment Share
+![dw-open-deployment-share.png](/.image/dw-open-deployment-share.png)
+3. Choose d:\mdt\lii-deploy
+![dw-deployment-share-path.png](/.image/dw-deployment-share-path.png)
+4. Click Next
+5. Click Finish
+6. Right click the share and choose properties
+![dw-properties.png](/.image/dw-properties.png)
+7. Update the Network UNC path with your server name.
+![dw-unc-path.png](/.image/dw-unc-path.png)
+8. Click the rules tab, and then click Edit Bootstrap.ini
+9. Update DeployRoot value
+![dw-boot.png](/.image/dw-boot.png)
+10. Close and Save file
+11. Click Ok
+12. Right click the share and choose update Deployment share
+![dw-update-share.png](/.image/dw-update-share.png)
+13. Click Next
+14. Click Next
+15. Click Finish
 
 In the Image share, import any new OS from DVD that you need to capture an image from "d:\mdt\source\Operating Systems"
 
-## Windows Deployment Services
+### Windows Deployment Services
 Once you have a working image in your Boot folder for either Deploy or Image we need to add the images to the Windows Deployment Service.
 
 ```powershell
@@ -125,8 +145,11 @@ Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageNa
 Import-WdsBootImage -Path D:\mdt\lii-image\Boot\LiteTouchPE_x64.wim -NewImageName "lii-image" -NewDescription "LII Image Share" -DisplayOrder "1000"
 ```
 
-Configure WDS to respond to any client.
-
+### Configure WDS to respond to any client.
+1. Launch the WDS management console
+2. Expand Servers, and right click the server you are working on and choose properties.
+3. Go to the PXE Response tab and choose Respond to all client computers (known and unknown)
+4. Click ok
 
 # Appendix
 
@@ -160,9 +183,29 @@ Install the following items, if you have run the robocopy you can find these in 
 ```
 ### Deployment Workbench
 
-Now you should be able to open both Deployment Shares in Deployment Workbench.
+1. Launch Deployment Workbench
+![deployment-workbench.png](/.image/deployment-workbench.png)
+2. Right click on Deployment Shares and choose open Deployment Share
+![dw-open-deployment-share.png](/.image/dw-open-deployment-share.png)
+3. Choose d:\mdt\lii-deploy
+![dw-deployment-share-path.png](/.image/dw-deployment-share-path.png)
+4. Click Next
+5. Click Finish
+6. Right click the share and choose properties
+![dw-properties.png](/.image/dw-properties.png)
+7. Update the Network UNC path with your server name.
+![dw-unc-path.png](/.image/dw-unc-path.png)
+8. Click the rules tab, and then click Edit Bootstrap.ini
+9. Update DeployRoot value
+![dw-boot.png](/.image/dw-boot.png)
+10. Close and Save file
+11. Click Ok
+12. Right click the share and choose update Deployment share
+![dw-update-share.png](/.image/dw-update-share.png)
+13. Click Next
+14. Click Next
+15. Click Finish
 
-Configure each deployment share to point to your computername / IP address in the properties, as well as the bootstrap.ini.  In the monitoring tab, update the hostname with the MDT server you are on.  Once complete, update the deployment share, this will regenerate the boot images.  
 
 ### Windows Deployment Services
 Once you have a working image in your Boot folder for either Deploy or Image we need to add the images to the Windows Deployment Service.
@@ -198,7 +241,7 @@ Revoke-SmbShareAccess -Name $DeploymentShare -AccountName "CREATOR OWNER" -Force
 
 Here are all the links I used as reference material as I reverse engineered the previous MDT build as well as planning for a multi-site easily supportable MDT design going forward.
 
-[Windows 10 Deployment with MDT](https://docs.microsoft.com/en-us/windows/deployment/deploy-windows-mdt/prepare-for-windows-deployment-with-mdt)
-[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image)
-[Configure MDT](https://mcpmag.com/articles/2018/12/13/configure-wds-using-powershell.aspx)
-[Hyper-V Lab Setup](https://malwaremily.medium.com/install-ad-ds-dns-and-dhcp-using-powershell-on-windows-server-2016-ac331e5988a7)
+[Windows 10 Deployment with MDT](https://docs.microsoft.com/en-us/windows/deployment/deploy-windows-mdt/prepare-for-windows-deployment-with-mdt) 
+[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image) 
+[Configure MDT](https://mcpmag.com/articles/2018/12/13/configure-wds-using-powershell.aspx) 
+[Hyper-V Lab Setup](https://malwaremily.medium.com/install-ad-ds-dns-and-dhcp-using-powershell-on-windows-server-2016-ac331e5988a7) 
