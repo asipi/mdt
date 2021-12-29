@@ -22,7 +22,6 @@
     + [Re-Configure NTFS Permissions for the MDT Build Lab deployment share if needed](#re-configure-ntfs-permissions-for-the-mdt-build-lab-deployment-share-if-needed)
   * [Reference Links](#reference-links)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 
 **Version 1.3a**
@@ -322,4 +321,4 @@ Here are all the links I used as reference material as I reverse engineered the 
 [Configure MDT](https://mcpmag.com/articles/2018/12/13/configure-wds-using-powershell.aspx)\
 [Hyper-V Lab Setup](https://malwaremily.medium.com/install-ad-ds-dns-and-dhcp-using-powershell-on-windows-server-2016-ac331e5988a7)\
 [MDT Drivers](https://web.sas.upenn.edu/jasonrw/2016/09/25/mdt-and-drivers/)\
-[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image)\
+[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image)
