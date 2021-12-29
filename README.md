@@ -1,5 +1,3 @@
-![llogo.png](/.image/livingston-logo.png)
-
 **Setting up MDT for Imaging and Deployment**
 
 **Table of Contents**
@@ -17,6 +15,7 @@
     + [Deployment Workbench](#deployment-workbench-1)
     + [Windows Deployment Services](#windows-deployment-services-2)
     + [Configure WDS to respond to any client.](#configure-wds-to-respond-to-any-client)
+    + [Lab sync](#lab-sync)
 - [Appendix](#appendix)
   * [List of MDT Servers](#list-of-mdt-servers)
   * [At Home MDT](#at-home-mdt)
@@ -27,6 +26,9 @@
   * [Troubleshooting](#troubleshooting)
     + [Re-Configure NTFS Permissions for the MDT Build Lab deployment share if needed](#re-configure-ntfs-permissions-for-the-mdt-build-lab-deployment-share-if-needed)
   * [Reference Links](#reference-links)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 
 **Version 1.3**
@@ -105,7 +107,7 @@ icacls $DeploymentShareNTFS /grant '"SYSTEM":(OI)(CI)(F)'
 15. Click Finish
 
 ### Windows Deployment Services
-Once the replication is complete, run the powershell (as admin) below to install and configure WDS.
+Once the image build is complete, run the powershell (as admin) below to install and configure WDS.
 
 ```powershell
 Install-WindowsFeature wds-deployment -includemanagementtools
@@ -259,6 +261,13 @@ Import-WdsBootImage -Path D:\mdt\lii-image\Boot\LiteTouchPE_x64.wim -NewImageNam
 2. Expand Servers, and right click the server you are working on and choose properties.
 3. Go to the PXE Response tab and choose Respond to all client computers (known and unknown)
 4. Click ok
+
+### Lab sync
+Once you have finished doing your changes that were required in the LAB, you can replicate to the main DFS share via robocopy.
+
+```shell
+robocopy d:\mdt\lii-deploy \\tr2wcinfmdt02\lii-deploy$ /mir /r:2 /w:1 /xf Bootstrap.ini CustomSettings.ini Audit.log
+```
 
 # Appendix
 
