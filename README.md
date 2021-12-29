@@ -2,17 +2,7 @@
 
 **Setting up MDT for Imaging and Deployment**
 
-**Version 1.3**
-
-**Revision History**
-| **Date** | **Revision \#** | **Editor** | **Description of Change** |
-|:-----------:|:-----------:|:-----------:|:-----------:|
-| 12/07/2021 | v1.0 | John Fogarty  | Initial Revision |
-| 12/17/2021 | v1.1 | John Fogarty  | Additional Documentation |
-| 12/23/2021 | v1.2 | John Fogarty  | Expanded Deployment Workbench steps |
-| 12/29/2021 | v1.3 | John Fogarty  | Expanded DFS Steps and appendix |
-
-**TOC**
+**Table of Contents**
 - [Overall Architecture](#overall-architecture)
 - [Configuration](#configuration)
   * [DFS primary deployment share](#dfs-primary-deployment-share)
@@ -37,6 +27,16 @@
     + [Re-Configure NTFS Permissions for the MDT Build Lab deployment share if needed](#re-configure-ntfs-permissions-for-the-mdt-build-lab-deployment-share-if-needed)
     + [List of MDT Servers](#list-of-mdt-servers)
   * [Reference Links](#reference-links)
+
+**Version 1.3**
+
+**Revision History**
+| **Date** | **Revision \#** | **Editor** | **Description of Change** |
+|:-----------:|:-----------:|:-----------:|:-----------:|
+| 12/07/2021 | v1.0 | John Fogarty  | Initial Revision |
+| 12/17/2021 | v1.1 | John Fogarty  | Additional Documentation |
+| 12/23/2021 | v1.2 | John Fogarty  | Expanded Deployment Workbench steps |
+| 12/29/2021 | v1.3 | John Fogarty  | Expanded DFS Steps and appendix |
 
 ----
 
