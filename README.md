@@ -12,6 +12,32 @@
 | 12/23/2021 | v1.2 | John Fogarty  | Expanded Deployment Workbench steps |
 | 12/29/2021 | v1.3 | John Fogarty  | Expanded DFS Steps and appendix |
 
+**TOC**
+- [Overall Architecture](#overall-architecture)
+- [Configuration](#configuration)
+  * [DFS primary deployment share](#dfs-primary-deployment-share)
+    + [Setup DFS and Deployment Share](#setup-dfs-and-deployment-share)
+    + [Deployment Workbench](#deployment-workbench)
+    + [Windows Deployment Services](#windows-deployment-services)
+  * [DFS read-only deployment shares](#dfs-read-only-deployment-shares)
+    + [Setup DFS-R and Deployment Share downstream server](#setup-dfs-r-and-deployment-share-downstream-server)
+    + [Windows Deployment Services](#windows-deployment-services-1)
+  * [Lab](#lab)
+    + [Hyper-V Lab creation script](#hyper-v-lab-creation-script)
+    + [Deployment Workbench](#deployment-workbench-1)
+    + [Windows Deployment Services](#windows-deployment-services-2)
+    + [Configure WDS to respond to any client.](#configure-wds-to-respond-to-any-client)
+- [Appendix](#appendix)
+  * [At Home MDT](#at-home-mdt)
+    + [File Copy](#file-copy)
+    + [Install MDT](#install-mdt)
+    + [Deployment Workbench](#deployment-workbench-2)
+    + [Windows Deployment Services](#windows-deployment-services-3)
+  * [Troubleshooting](#troubleshooting)
+    + [Re-Configure NTFS Permissions for the MDT Build Lab deployment share if needed](#re-configure-ntfs-permissions-for-the-mdt-build-lab-deployment-share-if-needed)
+    + [List of MDT Servers](#list-of-mdt-servers)
+  * [Reference Links](#reference-links)
+
 ----
 
 # Overall Architecture
@@ -316,7 +342,7 @@ Revoke-SmbShareAccess -Name $DeploymentShare -AccountName "CREATOR OWNER" -Force
 
 ### List of MDT Servers
 | **Name** | **Status** | **Notes** |
-|:-----------:|:-----------:|:-----------:|
+|:-----------:|:-----------:|:-----------|
 | 12/07/2021 | v1.0 | John Fogarty  | 
 | TR2WCINFMDT02 | online | new 2022 design | 
 | TWMWCINFMDT02 | online | new 2022 design | 
@@ -329,7 +355,7 @@ Revoke-SmbShareAccess -Name $DeploymentShare -AccountName "CREATOR OWNER" -Force
 | JUAWCINFMDT00 | online | legacy 2012 Juarez | 
 | MEXWCINFMDT00 | online | why is there two? 172.26.82.125 | 
 | MEXWCINFMDT02 | online | why is there two? 172.26.81.45 | 
-| MTAWCINFMDT01 | online | legacy 2012 Montreal Affiliated | 
+| MTAWCINFMDT01 | online | legacy 2012 McGill Montreal | 
 | MTLWCINFMDT00 | online | legacy 2012 CDL Montreal | 
 | POLWCINFMDT00 | online | legacy 2012 Poland | 
 | STEWCINFMDT00 | online | legacy 2012 Sterling | 
