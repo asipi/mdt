@@ -18,6 +18,7 @@
     + [Windows Deployment Services](#windows-deployment-services-2)
     + [Configure WDS to respond to any client.](#configure-wds-to-respond-to-any-client)
 - [Appendix](#appendix)
+  * [List of MDT Servers](#list-of-mdt-servers)
   * [At Home MDT](#at-home-mdt)
     + [File Copy](#file-copy)
     + [Install MDT](#install-mdt)
@@ -25,8 +26,8 @@
     + [Windows Deployment Services](#windows-deployment-services-3)
   * [Troubleshooting](#troubleshooting)
     + [Re-Configure NTFS Permissions for the MDT Build Lab deployment share if needed](#re-configure-ntfs-permissions-for-the-mdt-build-lab-deployment-share-if-needed)
-    + [List of MDT Servers](#list-of-mdt-servers)
   * [Reference Links](#reference-links)
+
 
 **Version 1.3**
 
@@ -261,6 +262,39 @@ Import-WdsBootImage -Path D:\mdt\lii-image\Boot\LiteTouchPE_x64.wim -NewImageNam
 
 # Appendix
 
+
+## List of MDT Servers
+| **Name** | **Status** | **Notes** |
+|:-----------:|:-----------:|:-----------|
+| 12/07/2021 | v1.0 | John Fogarty  | 
+| TR2WCINFMDT02 | online | new 2022 design | 
+| TWMWCINFMDT02 | online | new 2022 design | 
+| AIRWCINFMDT00 | online | legacy 2012 airport road | 
+| AJSWCINFMDT00 | online | ayush remote - will be a DFS-R point in the future | 
+| DC3WCINFMDT00 | online | legacy 2012 DC3 | 
+| FTEWCINFMDT01 | online | legacy 2012 Fort Erie | 
+| HSNWCINFMDT00 | online | legacy 2012 Houston | 
+| JAFWCINFMDT00 | online | John remote - will be a DFS-R point in the future | 
+| JUAWCINFMDT00 | online | legacy 2012 Juarez | 
+| MEXWCINFMDT00 | online | why is there two? 172.26.82.125 | 
+| MEXWCINFMDT02 | online | why is there two? 172.26.81.45 | 
+| MTAWCINFMDT01 | online | legacy 2012 McGill Montreal | 
+| MTLWCINFMDT00 | online | legacy 2012 CDL Montreal | 
+| POLWCINFMDT00 | online | legacy 2012 Poland | 
+| STEWCINFMDT00 | online | legacy 2012 Sterling | 
+| TAYWCINFMDT00 | online | legacy 2012 Taylor | 
+| TR2WCINFMDT00 | online | legacy 2012 TR2 | 
+| CHIWCINFMDT01 | offline | legacy 2012 Chicago, closed office | 
+| ITAWCINFMDT00 | offline | legacy 2012 Itasca, should be online? | 
+| MA1WCINFMDT00 | offline | where is this? 10.11.13.10 | 
+| MSSWCINFMDT01 | offline | where is this? 172.25.243.51 | 
+| REMWCINFMDT00 | offline | was it returned with netgate?
+| REMWCINFMDT01 | offline | was it returned with netgate?
+| REMWCINFMDTBM | offline | was it returned with netgate?
+| REMWCINFMDTJV | offline | was it returned with netgate?
+| REMWCINFMDTMS | offline | was it returned with netgate?
+| TONWCINFMDT00 | offline | legacy 2012 Tonowanda, should be online? |
+
 ## At Home MDT
 
 ### File Copy
@@ -339,38 +373,6 @@ $DeploymentShare = "lii-Deploy$"
 Grant-SmbShareAccess -Name $DeploymentShare -AccountName "EVERYONE" -AccessRight Change -Force
 Revoke-SmbShareAccess -Name $DeploymentShare -AccountName "CREATOR OWNER" -Force
 ```
-
-### List of MDT Servers
-| **Name** | **Status** | **Notes** |
-|:-----------:|:-----------:|:-----------|
-| 12/07/2021 | v1.0 | John Fogarty  | 
-| TR2WCINFMDT02 | online | new 2022 design | 
-| TWMWCINFMDT02 | online | new 2022 design | 
-| AIRWCINFMDT00 | online | legacy 2012 airport road | 
-| AJSWCINFMDT00 | online | ayush remote - will be a DFS-R point in the future | 
-| DC3WCINFMDT00 | online | legacy 2012 DC3 | 
-| FTEWCINFMDT01 | online | legacy 2012 Fort Erie | 
-| HSNWCINFMDT00 | online | legacy 2012 Houston | 
-| JAFWCINFMDT00 | online | John remote - will be a DFS-R point in the future | 
-| JUAWCINFMDT00 | online | legacy 2012 Juarez | 
-| MEXWCINFMDT00 | online | why is there two? 172.26.82.125 | 
-| MEXWCINFMDT02 | online | why is there two? 172.26.81.45 | 
-| MTAWCINFMDT01 | online | legacy 2012 McGill Montreal | 
-| MTLWCINFMDT00 | online | legacy 2012 CDL Montreal | 
-| POLWCINFMDT00 | online | legacy 2012 Poland | 
-| STEWCINFMDT00 | online | legacy 2012 Sterling | 
-| TAYWCINFMDT00 | online | legacy 2012 Taylor | 
-| TR2WCINFMDT00 | online | legacy 2012 TR2 | 
-| CHIWCINFMDT01 | offline | legacy 2012 Chicago, closed office | 
-| ITAWCINFMDT00 | offline | legacy 2012 Itasca, should be online? | 
-| MA1WCINFMDT00 | offline | where is this? 10.11.13.10 | 
-| MSSWCINFMDT01 | offline | where is this? 172.25.243.51 | 
-| REMWCINFMDT00 | offline | was it returned with netgate?
-| REMWCINFMDT01 | offline | was it returned with netgate?
-| REMWCINFMDTBM | offline | was it returned with netgate?
-| REMWCINFMDTJV | offline | was it returned with netgate?
-| REMWCINFMDTMS | offline | was it returned with netgate?
-| TONWCINFMDT00 | offline | legacy 2012 Tonowanda, should be online? |
 
 
 
