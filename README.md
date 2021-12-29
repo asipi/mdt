@@ -2,7 +2,7 @@
 
 **Table of Contents**
 - [Overall Architecture](#overall-architecture)
-- [Configuration](#configuration)
+- [Configuration of MDT](#configuration-of-mdt)
   * [DFS primary deployment share](#dfs-primary-deployment-share)
     + [Setup DFS and Deployment Share](#setup-dfs-and-deployment-share)
     + [Deployment Workbench](#deployment-workbench)
@@ -18,11 +18,6 @@
     + [Lab sync](#lab-sync)
 - [Appendix](#appendix)
   * [List of MDT Servers](#list-of-mdt-servers)
-  * [At Home MDT](#at-home-mdt)
-    + [File Copy](#file-copy)
-    + [Install MDT](#install-mdt)
-    + [Deployment Workbench](#deployment-workbench-2)
-    + [Windows Deployment Services](#windows-deployment-services-3)
   * [Troubleshooting](#troubleshooting)
     + [Re-Configure NTFS Permissions for the MDT Build Lab deployment share if needed](#re-configure-ntfs-permissions-for-the-mdt-build-lab-deployment-share-if-needed)
   * [Reference Links](#reference-links)
@@ -30,8 +25,7 @@
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 
-
-**Version 1.3**
+**Version 1.3a**
 
 **Revision History**
 | **Date** | **Revision \#** | **Editor** | **Description of Change** |
@@ -40,6 +34,7 @@
 | 12/17/2021 | v1.1 | John Fogarty  | Additional Documentation |
 | 12/23/2021 | v1.2 | John Fogarty  | Expanded Deployment Workbench steps |
 | 12/29/2021 | v1.3 | John Fogarty  | Expanded DFS Steps and appendix |
+| 12/29/2021 | v1.3a | John Fogarty  | Removed home mdt section, should be no different than dfs-r site |
 
 ----
 
@@ -55,12 +50,9 @@ You can see in the diagram below how these pieces flow together to keep all MDT 
 [![dfs-diagram.png](/.image/dfs-diagram.png)](https://lucid.app/lucidchart/9b876d58-992d-4a1d-8ca1-5d85899975e6/edit?invitationId=inv_92c65d1d-caee-4acb-9009-523605ece512)
 
 ----
-# Configuration
+# Configuration of MDT
 ## DFS primary deployment share
 All files will live on the primary deployment share.  The DFS primary server is tr2wcinfmdt02, this is also the server where all MDT clients will report their status for monitoring.  
-
-DFS Staging quota should be 25,600,000MB
-DFS Advanced quota should be set to 8192MB
 
 ### Setup DFS and Deployment Share
 Once the server is online, configure DFS and the deployment share.
@@ -78,7 +70,11 @@ new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Every
 icacls $DeploymentShareNTFS /grant '"Users":(OI)(CI)(RX)'
 icacls $DeploymentShareNTFS /grant '"Administrators":(OI)(CI)(F)'
 icacls $DeploymentShareNTFS /grant '"SYSTEM":(OI)(CI)(F)'
-
+$domain = 'lii01.livun.com'
+New-DfsReplicationGroup -GroupName lii-deploy -DomainName $domain -Description 'Replication Group for lii-deploy shares' 
+Add-DfsrMember -GroupName lii-deploy -ComputerName tr2wcinfmdt02
+new-dfsreplicatedfolder -GroupName lii-deploy -FolderName lii-deploy -Domain $domain -dfsnpath \\$domain\lii-deploy
+set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName tr2wcinfmdt02 -Contentpath $DeploymentShareNTFS -primarymember $true -StagingPathQuotaInMB 25600000
 ```
 
 ### Deployment Workbench
@@ -117,19 +113,20 @@ Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageNa
 ```
 
 ## DFS read-only deployment shares
-Deployment shares will live on DFS-R replicas of the primary share, and will only have WDS installed locally for PXE Boot.
+Deployment shares will live on DFS-R replicas of the primary share, and will only have WDS installed locally for PXE Boot.  The server should be Windows 2022, 8gb RAM, 300GB C: and 500GB D:.
 
 ### Setup DFS-R and Deployment Share downstream server
 Once the server is online, configure DFS and the deployment share.
 
 ```powershell
+mkdir d:\mdt
+mkdir d:\mdt\lii-deploy
 Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
-icacls $DeploymentShareNTFS /grant '"Users":(OI)(CI)(RX)'
-icacls $DeploymentShareNTFS /grant '"Administrators":(OI)(CI)(F)'
-icacls $DeploymentShareNTFS /grant '"SYSTEM":(OI)(CI)(F)'
-
+add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername 
+set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true
+Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername  
 ```
 
 ### Windows Deployment Services
@@ -192,25 +189,26 @@ Install-WindowsFeature wds-deployment -includemanagementtools
 
 Lets create your DFS Read Replica of the deployment share. **TBD**
 ```powershell
-Install-WindowsFeature -Name FS-DFS-Namespace,FS-DFS-Replication –IncludeManagementTools
+mkdir d:\mdt
+mkdir d:\mdt\lii-deploy
+Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
+$DeploymentShareNTFS = "d:\mdt\lii-deploy"
+new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
+add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername 
+set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true
+Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername  
 ```
 https://docs.microsoft.com/en-us/powershell/module/dfsr/set-dfsrmembership?view=windowsserver2019-ps
 
 
-Now lets create the Folder structure for your deployment shares.
-```powershell
-mkdir d:\mdt
-robocopy \\tr2wcinfmdt00\lii-deploy$ d:\mdt\lii-deploy /mir /r:2 /w:1
+Once replication is complete, lets create your lii-image share.
+```shell
 robocopy d:\mdt\lii-deploy d:\mdt\lii-image /mir /r:2 /w:1
-robocopy \\tr2wcinfmdt00\d$\mdt\source d:\mdt\source /mir /r:2 /w:1
 ```
 
 ```powershell
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
-icacls $DeploymentShareNTFS /grant '"Users":(OI)(CI)(RX)'
-icacls $DeploymentShareNTFS /grant '"Administrators":(OI)(CI)(F)'
-icacls $DeploymentShareNTFS /grant '"SYSTEM":(OI)(CI)(F)'
 
 $ImageDeploymentShareNTFS = "d:\mdt\lii-image"
 new-smbshare -Name "lii-image$" -path $ImageDeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
@@ -252,21 +250,16 @@ Once you have a working image in your Boot folder for either Deploy or Image we 
 
 ```powershell
 wdsutil /initialize-server /remInst:"d:\RemoteInstall"
+wdsutil /Set-Server /AnswerClients:All 
 Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
 Import-WdsBootImage -Path D:\mdt\lii-image\Boot\LiteTouchPE_x64.wim -NewImageName "lii-image" -NewDescription "LII Image Share" -DisplayOrder "1000"
 ```
-
-### Configure WDS to respond to any client.
-1. Launch the WDS management console
-2. Expand Servers, and right click the server you are working on and choose properties.
-3. Go to the PXE Response tab and choose Respond to all client computers (known and unknown)
-4. Click ok
 
 ### Lab sync
 Once you have finished doing your changes that were required in the LAB, you can replicate to the main DFS share via robocopy.
 
 ```shell
-robocopy d:\mdt\lii-deploy \\tr2wcinfmdt02\lii-deploy$ /mir /r:2 /w:1 /xf Bootstrap.ini CustomSettings.ini Audit.log
+robocopy d:\mdt\lii-image \\tr2wcinfmdt02\lii-deploy$ /mir /r:2 /w:1 /xf Bootstrap.ini CustomSettings.ini Audit.log settings.xml
 ```
 
 # Appendix
@@ -304,69 +297,6 @@ robocopy d:\mdt\lii-deploy \\tr2wcinfmdt02\lii-deploy$ /mir /r:2 /w:1 /xf Bootst
 | REMWCINFMDTMS | offline | was it returned with netgate?
 | TONWCINFMDT00 | offline | legacy 2012 Tonowanda, should be online? |
 
-## At Home MDT
-
-### File Copy
-create the Folder structure for your deployment shares.
-```powershell
-mkdir d:\mdt
-robocopy \\tr2wcinfmdt00\lii-deploy$ d:\mdt\lii-deploy /mir /r:2 /w:1
-robocopy \\tr2wcinfmdt00\d$\mdt\source d:\mdt\source /mir /r:2 /w:1
-```
-
-```powershell
-$DeploymentShareNTFS = "d:\mdt\lii-deploy"
-new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
-icacls $DeploymentShareNTFS /grant '"Users":(OI)(CI)(RX)'
-icacls $DeploymentShareNTFS /grant '"Administrators":(OI)(CI)(F)'
-icacls $DeploymentShareNTFS /grant '"SYSTEM":(OI)(CI)(F)'
-```
-
-### Install MDT
-Install the following items, if you have run the robocopy you can find these in d:\mdt\mdt_install.
-
-* [The Windows ADK for Windows 10](https://go.microsoft.com/fwlink/?linkid=2086042)
-* [The Windows PE add-on for the ADK](https://go.microsoft.com/fwlink/?linkid=2087112)
-* [Microsoft Deployment Toolkit](https://www.microsoft.com/en-us/download/confirmation.aspx?id=54259)
-* Windows Deployment Services (Powershell below)
-```powershell
-Install-WindowsFeature wds-deployment -includemanagementtools
-```
-### Deployment Workbench
-
-1. Launch Deployment Workbench\
-![deployment-workbench.png](/.image/deployment-workbench.png)
-2. Right click on Deployment Shares and choose open Deployment Share\
-![dw-open-deployment-share.png](/.image/dw-open-deployment-share.png)
-3. Choose d:\mdt\lii-deploy  
-![dw-deployment-share-path.png](/.image/dw-deployment-share-path.png)
-4. Click Next
-5. Click Finish
-6. Right click the share and choose properties\
-![dw-properties.png](/.image/dw-properties.png)
-7. Update the Network UNC path with your server name.\
-![dw-unc-path.png](/.image/dw-unc-path.png)
-8. Click the rules tab, and then click Edit Bootstrap.ini
-9. Update DeployRoot value\
-![dw-boot.png](/.image/dw-boot.png)
-10. Close and Save file
-11. Click Ok
-12. Right click the share and choose update Deployment share\
-![dw-update-share.png](/.image/dw-update-share.png)
-13. Click Next
-14. Click Next
-15. Click Finish
-
-
-### Windows Deployment Services
-Once you have a working image in your Boot folder for either Deploy or Image we need to add the images to the Windows Deployment Service.
-
-```powershell
-wdsutil /initialize-server /remInst:"d:\RemoteInstall"
-wdsutil /Set-Server /AnswerClients:All 
-Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
-```
-
 ## Troubleshooting 
 
 ### Re-Configure NTFS Permissions for the MDT Build Lab deployment share if needed
@@ -383,14 +313,13 @@ Grant-SmbShareAccess -Name $DeploymentShare -AccountName "EVERYONE" -AccessRight
 Revoke-SmbShareAccess -Name $DeploymentShare -AccountName "CREATOR OWNER" -Force
 ```
 
-
-
 ## Reference Links
 
 Here are all the links I used as reference material as I reverse engineered the previous MDT build as well as planning for a multi-site easily supportable MDT design going forward.
 
 [Windows 10 Deployment with MDT](https://docs.microsoft.com/en-us/windows/deployment/deploy-windows-mdt/prepare-for-windows-deployment-with-mdt)\
-[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image)\
+[Distributed MDT](https://docs.microsoft.com/en-us/windows/deployment/deploy-windows-mdt/build-a-distributed-environment-for-windows-10-deployment)\
 [Configure MDT](https://mcpmag.com/articles/2018/12/13/configure-wds-using-powershell.aspx)\
 [Hyper-V Lab Setup](https://malwaremily.medium.com/install-ad-ds-dns-and-dhcp-using-powershell-on-windows-server-2016-ac331e5988a7)\
 [MDT Drivers](https://web.sas.upenn.edu/jasonrw/2016/09/25/mdt-and-drivers/)\
+[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image)\
