@@ -2,7 +2,7 @@
 
 **Setting up MDT for Imaging and Deployment**
 
-**Version 1.2**
+**Version 1.3**
 
 **Revision History**
 | **Date** | **Revision \#** | **Editor** | **Description of Change** |
@@ -10,6 +10,7 @@
 | 12/07/2021 | v1.0 | John Fogarty  | Initial Revision |
 | 12/17/2021 | v1.1 | John Fogarty  | Additional Documentation |
 | 12/23/2021 | v1.2 | John Fogarty  | Expanded Deployment Workbench steps |
+| 12/29/2021 | v1.3 | John Fogarty  | Expanded DFS Steps and appendix |
 
 ----
 
@@ -27,9 +28,90 @@ You can see in the diagram below how these pieces flow together to keep all MDT 
 ----
 # Configuration
 ## DFS primary deployment share
+All files will live on the primary deployment share.  The DFS primary server is tr2wcinfmdt02, this is also the server where all MDT clients will report their status for monitoring.  
+
+DFS Staging quota should be 25,600,000MB
+DFS Advanced quota should be set to 8192MB
+
+### Setup DFS and Deployment Share
+Once the server is online, configure DFS and the deployment share.
+
+Install the following items.
+
+* [The Windows ADK for Windows 10](https://go.microsoft.com/fwlink/?linkid=2086042)
+* [The Windows PE add-on for the ADK](https://go.microsoft.com/fwlink/?linkid=2087112)
+* [Microsoft Deployment Toolkit](https://www.microsoft.com/en-us/download/confirmation.aspx?id=54259)
+
+```powershell
+Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
+$DeploymentShareNTFS = "d:\mdt\lii-deploy"
+new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
+icacls $DeploymentShareNTFS /grant '"Users":(OI)(CI)(RX)'
+icacls $DeploymentShareNTFS /grant '"Administrators":(OI)(CI)(F)'
+icacls $DeploymentShareNTFS /grant '"SYSTEM":(OI)(CI)(F)'
+
+```
+
+### Deployment Workbench
+
+1. Launch Deployment Workbench\
+![deployment-workbench.png](/.image/deployment-workbench.png)
+2. Right click on Deployment Shares and choose open Deployment Share\
+![dw-open-deployment-share.png](/.image/dw-open-deployment-share.png)
+3. Choose d:\mdt\lii-deploy  
+![dw-deployment-share-path.png](/.image/dw-deployment-share-path.png)
+4. Click Next
+5. Click Finish
+6. Right click the share and choose properties\
+![dw-properties.png](/.image/dw-properties.png)
+7. Update the Network UNC path with your server name.\
+![dw-unc-path.png](/.image/dw-unc-path.png)
+8. Click the rules tab, and then click Edit Bootstrap.ini
+9. Update DeployRoot value\
+![dw-boot.png](/.image/dw-boot.png)
+10. Close and Save file
+11. Click Ok
+12. Right click the share and choose update Deployment share\
+![dw-update-share.png](/.image/dw-update-share.png)
+13. Click Next
+14. Click Next
+15. Click Finish
+
+### Windows Deployment Services
+Once the replication is complete, run the powershell (as admin) below to install and configure WDS.
+
+```powershell
+Install-WindowsFeature wds-deployment -includemanagementtools
+wdsutil /initialize-server /remInst:"d:\RemoteInstall"
+wdsutil /Set-Server /AnswerClients:All 
+Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
+```
 
 ## DFS read-only deployment shares
+Deployment shares will live on DFS-R replicas of the primary share, and will only have WDS installed locally for PXE Boot.
 
+### Setup DFS-R and Deployment Share downstream server
+Once the server is online, configure DFS and the deployment share.
+
+```powershell
+Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
+$DeploymentShareNTFS = "d:\mdt\lii-deploy"
+new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
+icacls $DeploymentShareNTFS /grant '"Users":(OI)(CI)(RX)'
+icacls $DeploymentShareNTFS /grant '"Administrators":(OI)(CI)(F)'
+icacls $DeploymentShareNTFS /grant '"SYSTEM":(OI)(CI)(F)'
+
+```
+
+### Windows Deployment Services
+Once the replication is complete, run the powershell (as admin) below to install and configure WDS.
+
+```powershell
+Install-WindowsFeature wds-deployment -includemanagementtools
+wdsutil /initialize-server /remInst:"d:\RemoteInstall"
+wdsutil /Set-Server /AnswerClients:All 
+Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
+```
 
 ## Lab
 The lab setup is the most important part of MDT.  You will build your images in the lab, and test your deployments in the lab before rolling them out to the DFS primary deployment share.
@@ -212,14 +294,9 @@ Once you have a working image in your Boot folder for either Deploy or Image we 
 
 ```powershell
 wdsutil /initialize-server /remInst:"d:\RemoteInstall"
+wdsutil /Set-Server /AnswerClients:All 
 Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
 ```
-
-### Configure WDS to respond to any client.
-1. Launch the WDS management console
-2. Expand Servers, and right click the server you are working on and choose properties.
-3. Go to the PXE Response tab and choose Respond to all client computers (known and unknown)
-4. Click ok
 
 ## Troubleshooting 
 
@@ -237,11 +314,46 @@ Grant-SmbShareAccess -Name $DeploymentShare -AccountName "EVERYONE" -AccessRight
 Revoke-SmbShareAccess -Name $DeploymentShare -AccountName "CREATOR OWNER" -Force
 ```
 
+### List of MDT Servers
+| **Name** | **Status** | **Notes** |
+|:-----------:|:-----------:|:-----------:|
+| 12/07/2021 | v1.0 | John Fogarty  | 
+| TR2WCINFMDT02 | online | new 2022 design | 
+| TWMWCINFMDT02 | online | new 2022 design | 
+| AIRWCINFMDT00 | online | legacy 2012 airport road | 
+| AJSWCINFMDT00 | online | ayush remote - will be a DFS-R point in the future | 
+| DC3WCINFMDT00 | online | legacy 2012 DC3 | 
+| FTEWCINFMDT01 | online | legacy 2012 Fort Erie | 
+| HSNWCINFMDT00 | online | legacy 2012 Houston | 
+| JAFWCINFMDT00 | online | John remote - will be a DFS-R point in the future | 
+| JUAWCINFMDT00 | online | legacy 2012 Juarez | 
+| MEXWCINFMDT00 | online | why is there two? 172.26.82.125 | 
+| MEXWCINFMDT02 | online | why is there two? 172.26.81.45 | 
+| MTAWCINFMDT01 | online | legacy 2012 Montreal Affiliated | 
+| MTLWCINFMDT00 | online | legacy 2012 CDL Montreal | 
+| POLWCINFMDT00 | online | legacy 2012 Poland | 
+| STEWCINFMDT00 | online | legacy 2012 Sterling | 
+| TAYWCINFMDT00 | online | legacy 2012 Taylor | 
+| TR2WCINFMDT00 | online | legacy 2012 TR2 | 
+| CHIWCINFMDT01 | offline | legacy 2012 Chicago, closed office | 
+| ITAWCINFMDT00 | offline | legacy 2012 Itasca, should be online? | 
+| MA1WCINFMDT00 | offline | where is this? 10.11.13.10 | 
+| MSSWCINFMDT01 | offline | where is this? 172.25.243.51 | 
+| REMWCINFMDT00 | offline | was it returned with netgate?
+| REMWCINFMDT01 | offline | was it returned with netgate?
+| REMWCINFMDTBM | offline | was it returned with netgate?
+| REMWCINFMDTJV | offline | was it returned with netgate?
+| REMWCINFMDTMS | offline | was it returned with netgate?
+| TONWCINFMDT00 | offline | legacy 2012 Tonowanda, should be online? |
+
+
+
 ## Reference Links
 
 Here are all the links I used as reference material as I reverse engineered the previous MDT build as well as planning for a multi-site easily supportable MDT design going forward.
 
-[Windows 10 Deployment with MDT](https://docs.microsoft.com/en-us/windows/deployment/deploy-windows-mdt/prepare-for-windows-deployment-with-mdt)  
-[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image)   
-[Configure MDT](https://mcpmag.com/articles/2018/12/13/configure-wds-using-powershell.aspx)  
-[Hyper-V Lab Setup](https://malwaremily.medium.com/install-ad-ds-dns-and-dhcp-using-powershell-on-windows-server-2016-ac331e5988a7)  
+[Windows 10 Deployment with MDT](https://docs.microsoft.com/en-us/windows/deployment/deploy-windows-mdt/prepare-for-windows-deployment-with-mdt)\
+[Office 365 as part of an image](https://docs.microsoft.com/en-us/deployoffice/deploy-microsoft-365-apps-operating-system-image)\
+[Configure MDT](https://mcpmag.com/articles/2018/12/13/configure-wds-using-powershell.aspx)\
+[Hyper-V Lab Setup](https://malwaremily.medium.com/install-ad-ds-dns-and-dhcp-using-powershell-on-windows-server-2016-ac331e5988a7)\
+[MDT Drivers](https://web.sas.upenn.edu/jasonrw/2016/09/25/mdt-and-drivers/)\
