@@ -24,7 +24,7 @@
 
 
 
-**Version 1.3a**
+**Version 1.4**
 
 **Revision History**
 | **Date** | **Revision \#** | **Editor** | **Description of Change** |
@@ -34,6 +34,7 @@
 | 12/23/2021 | v1.2 | John Fogarty  | Expanded Deployment Workbench steps |
 | 12/29/2021 | v1.3 | John Fogarty  | Expanded DFS Steps and appendix |
 | 12/29/2021 | v1.3a | John Fogarty  | Removed home mdt section, should be no different than dfs-r site |
+| 01/03/2022 | v1.4 | John Fogarty  | Finalized DFS-R settings, script and comments |
 
 ----
 
@@ -51,7 +52,7 @@ You can see in the diagram below how these pieces flow together to keep all MDT 
 ----
 # Configuration of MDT
 ## DFS primary deployment share
-All files will live on the primary deployment share.  The DFS primary server is tr2wcinfmdt02, this is also the server where all MDT clients will report their status for monitoring.  
+All files will live on the primary deployment share.  The DFS primary server is tr2wcinfmdt02, this is also the server where all MDT clients will report their status for monitoring. You must make sure that the d:\mdt\lii-deploy\control\bootstrap.ini and d:\mdt\lii-deploy\control\customsettings.ini file both contain the gateway to site mapping as well as the deployment root for the site.  This is how we can keep everything centrally maintained, and is critical to the process. 
 
 ### Setup DFS and Deployment Share
 Once the server is online, configure DFS and the deployment share.
@@ -123,9 +124,16 @@ mkdir d:\mdt\lii-deploy
 Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
-add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername 
+add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername
 set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true
-Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername  
+Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername
+$tr2hash = get-dfsrfilehash \\tr2wcinfmdt02\d$\mdt\lii-deploy
+write-host 'sleeping for 10 minutes'
+Start-Sleep -s 600
+Do {
+    $newhash = get-dfsrfilehash d:\mdt\lii-deploy ; write-host 'still waiting sleeping for another minute' ; start-sleep 60
+    }
+Until ($tr2hash.filehash -eq $newhash.filehash)
 ```
 
 ### Windows Deployment Services
@@ -193,9 +201,16 @@ mkdir d:\mdt\lii-deploy
 Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
-add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername 
+add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername
 set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true
-Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername  
+Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername
+$tr2hash = get-dfsrfilehash \\tr2wcinfmdt02\d$\mdt\lii-deploy
+write-host 'sleeping for 10 minutes'
+Start-Sleep -s 600
+Do {
+    $newhash = get-dfsrfilehash d:\mdt\lii-deploy ; write-host 'still waiting sleeping for another minute' ; start-sleep 60
+    }
+Until ($tr2hash.filehash -eq $newhash.filehash)
 ```
 https://docs.microsoft.com/en-us/powershell/module/dfsr/set-dfsrmembership?view=windowsserver2019-ps
 
