@@ -33,7 +33,7 @@
 | 12/29/2021 | v1.3 | John Fogarty  | Expanded DFS Steps and appendix |
 | 12/29/2021 | v1.3a | John Fogarty  | Removed home mdt section, should be no different than dfs-r site |
 | 01/03/2022 | v1.4 | John Fogarty  | Finalized DFS-R settings, script and comments |
-| 01/05/2022 | v1.5 | John Fogarty  | added -force to set-dfsrmembership command to eliminate prompt |
+| 01/05/2022 | v1.5 | John Fogarty  | added -force to set-dfsrmembership command to eliminate prompt, remove extra lii-deploy share creation in lab setup |
 
 ----
 
@@ -220,9 +220,6 @@ robocopy d:\mdt\lii-deploy d:\mdt\lii-image /mir /r:2 /w:1
 ```
 
 ```powershell
-$DeploymentShareNTFS = "d:\mdt\lii-deploy"
-new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
-
 $ImageDeploymentShareNTFS = "d:\mdt\lii-image"
 new-smbshare -Name "lii-image$" -path $ImageDeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
 icacls $ImageDeploymentShareNTFS /grant '"Users":(OI)(CI)(RX)'
