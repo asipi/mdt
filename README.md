@@ -14,14 +14,12 @@
     + [Hyper-V Lab creation script](#hyper-v-lab-creation-script)
     + [Deployment Workbench](#deployment-workbench-1)
     + [Windows Deployment Services](#windows-deployment-services-2)
-    + [Configure WDS to respond to any client.](#configure-wds-to-respond-to-any-client)
     + [Lab sync](#lab-sync)
 - [Appendix](#appendix)
   * [List of MDT Servers](#list-of-mdt-servers)
   * [Troubleshooting](#troubleshooting)
     + [Re-Configure NTFS Permissions for the MDT Build Lab deployment share if needed](#re-configure-ntfs-permissions-for-the-mdt-build-lab-deployment-share-if-needed)
   * [Reference Links](#reference-links)
-
 
 
 **Version 1.5**
