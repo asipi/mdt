@@ -24,7 +24,7 @@
 
 
 
-**Version 1.4**
+**Version 1.5**
 
 **Revision History**
 | **Date** | **Revision \#** | **Editor** | **Description of Change** |
@@ -35,6 +35,7 @@
 | 12/29/2021 | v1.3 | John Fogarty  | Expanded DFS Steps and appendix |
 | 12/29/2021 | v1.3a | John Fogarty  | Removed home mdt section, should be no different than dfs-r site |
 | 01/03/2022 | v1.4 | John Fogarty  | Finalized DFS-R settings, script and comments |
+| 01/05/2022 | v1.5 | John Fogarty  | added -force to set-dfsrmembership command to eliminate prompt |
 
 ----
 
@@ -125,7 +126,7 @@ Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
 add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername
-set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true
+set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true -force
 Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername
 $tr2hash = get-dfsrfilehash \\tr2wcinfmdt02\d$\mdt\lii-deploy
 write-host 'sleeping for 10 minutes'
@@ -202,7 +203,7 @@ Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
 add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername
-set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true
+set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true -force
 Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername
 $tr2hash = get-dfsrfilehash \\tr2wcinfmdt02\d$\mdt\lii-deploy
 write-host 'sleeping for 10 minutes'
