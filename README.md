@@ -235,20 +235,20 @@ icacls "$ImageDeploymentShareNTFS\Captures" /grant '"Administrators":(OI)(CI)(M)
 2. Right click on Deployment Shares and choose open Deployment Share\
 ![dw-open-deployment-share.png](/.image/dw-open-deployment-share.png)
 3. Choose d:\mdt\lii-deploy  
-![dw-deployment-share-path.png](/.image/dw-deployment-share-path.png)
+![dw-deployment-share-path-image.png](/.image/dw-deployment-share-path-image.png)
 4. Click Next
 5. Click Finish
 6. Right click the share and choose properties\
-![dw-properties.png](/.image/dw-properties.png)
+![dw-properties-image.png](/.image/dw-properties-image.png)
 7. Update the Network UNC path with your server name.\
-![dw-unc-path.png](/.image/dw-unc-path.png)
+![dw-unc-path-image.png](/.image/dw-unc-path-image.png)
 8. Click the rules tab, and then click Edit Bootstrap.ini
 9. Update DeployRoot value\
-![dw-boot.png](/.image/dw-boot.png)
+![dw-boot-image.png](/.image/dw-boot-image.png)
 10. Close and Save file
 11. Click Ok
 12. Right click the share and choose update Deployment share\
-![dw-update-share.png](/.image/dw-update-share.png)
+![dw-update-share-image.png](/.image/dw-update-share-image.png)
 13. Click Next
 14. Click Next
 15. Click Finish
@@ -266,10 +266,10 @@ Import-WdsBootImage -Path D:\mdt\lii-image\Boot\LiteTouchPE_x64.wim -NewImageNam
 ```
 
 ### Lab sync
-Once you have finished doing your changes that were required in the LAB, you can replicate to the main DFS share via robocopy.
+Once you have finished doing your changes that were required in the LAB, you can replicate to the main DFS share via robocopy, replace TEST001 with whatever tasklist you are currently testing.
 
 ```shell
-robocopy d:\mdt\lii-image \\tr2wcinfmdt02\lii-deploy$ /mir /r:2 /w:1 /xf Bootstrap.ini CustomSettings.ini Audit.log settings.xml
+robocopy d:\mdt\lii-image \\tr2wcinfmdt02\lii-deploy$ /mir /r:2 /w:1 /xf Bootstrap.ini CustomSettings.ini Audit.log settings.xml /xd DfsrPrivate Boot TEST001
 ```
 
 # Appendix
