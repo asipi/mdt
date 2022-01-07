@@ -73,7 +73,7 @@ $domain = 'lii01.livun.com'
 New-DfsReplicationGroup -GroupName lii-deploy -DomainName $domain -Description 'Replication Group for lii-deploy shares' 
 Add-DfsrMember -GroupName lii-deploy -ComputerName tr2wcinfmdt02
 new-dfsreplicatedfolder -GroupName lii-deploy -FolderName lii-deploy -Domain $domain -dfsnpath \\$domain\lii-deploy
-set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName tr2wcinfmdt02 -Contentpath $DeploymentShareNTFS -primarymember $true -StagingPathQuotaInMB 25600000
+set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName tr2wcinfmdt02 -Contentpath $DeploymentShareNTFS -primarymember $true -StagingPathQuotaInMB 51200000
 ```
 
 ### Deployment Workbench
@@ -124,7 +124,7 @@ Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
 add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername
-set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true -force
+set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 51200000 -readonly $true -force
 Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername
 $tr2hash = get-dfsrfilehash \\tr2wcinfmdt02\d$\mdt\lii-deploy
 write-host 'sleeping for 10 minutes'
@@ -201,7 +201,7 @@ Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
 add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername
-set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 25600000 -readonly $true -force
+set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 51200000 -readonly $true -force
 Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername
 $tr2hash = get-dfsrfilehash \\tr2wcinfmdt02\d$\mdt\lii-deploy
 write-host 'sleeping for 10 minutes'
