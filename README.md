@@ -111,6 +111,13 @@ wdsutil /Set-Server /AnswerClients:All
 Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
 ```
 
+Whenever there is an update to the boot image, you must first remove the boot image, and then import the boot image.
+
+```powershell
+remove-wdsbootimage -ImageName "lii-deploy" -Architecture 3
+Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
+```
+
 ## DFS read-only deployment shares
 Deployment shares will live on DFS-R replicas of the primary share, and will only have WDS installed locally for PXE Boot.  The server should be Windows 2022, 8gb RAM, 300GB C: and 500GB D:.
 
@@ -140,8 +147,21 @@ Once the replication is complete, run the powershell (as admin) below to install
 
 ```powershell
 Install-WindowsFeature wds-deployment -includemanagementtools
+restart-computer -force
+```
+
+Post reboot
+
+```powershell
 wdsutil /initialize-server /remInst:"d:\RemoteInstall"
 wdsutil /Set-Server /AnswerClients:All 
+Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
+```
+
+Whenever there is an update to the boot image, you must first remove the boot image, and then import the boot image.
+
+```powershell
+remove-wdsbootimage -ImageName "lii-deploy" -Architecture 3
 Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
 ```
 
@@ -263,6 +283,13 @@ wdsutil /initialize-server /remInst:"d:\RemoteInstall"
 wdsutil /Set-Server /AnswerClients:All 
 Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
 Import-WdsBootImage -Path D:\mdt\lii-image\Boot\LiteTouchPE_x64.wim -NewImageName "lii-image" -NewDescription "LII Image Share" -DisplayOrder "1000"
+```
+
+Whenever there is an update to the boot image, you must first remove the boot image, and then import the boot image.
+
+```powershell
+remove-wdsbootimage -ImageName "lii-deploy" -Architecture 3
+Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageName "lii-deploy" -NewDescription "LII Deployment Share" -DisplayOrder "10"
 ```
 
 ### Lab sync
