@@ -22,7 +22,7 @@
   * [Reference Links](#reference-links)
 
 
-**Version 1.5**
+**Version 1.6**
 
 **Revision History**
 | **Date** | **Revision \#** | **Editor** | **Description of Change** |
@@ -34,6 +34,7 @@
 | 12/29/2021 | v1.3a | John Fogarty  | Removed home mdt section, should be no different than dfs-r site |
 | 01/03/2022 | v1.4 | John Fogarty  | Finalized DFS-R settings, script and comments |
 | 01/05/2022 | v1.5 | John Fogarty  | added -force to set-dfsrmembership command to eliminate prompt, remove extra lii-deploy share creation in lab setup |
+| 05/22/2022 | v1.6 | John Fogarty  | changed dfs group and adjusted documentation for new mdt infrastructure. |
 
 ----
 
@@ -51,7 +52,7 @@ You can see in the diagram below how these pieces flow together to keep all MDT 
 ----
 # Configuration of MDT
 ## DFS primary deployment share
-All files will live on the primary deployment share.  The DFS primary server is tr2wcinfmdt02, this is also the server where all MDT clients will report their status for monitoring. You must make sure that the d:\mdt\lii-deploy\control\bootstrap.ini and d:\mdt\lii-deploy\control\customsettings.ini file both contain the gateway to site mapping as well as the deployment root for the site.  This is how we can keep everything centrally maintained, and is critical to the process. 
+All files will live on the primary deployment share.  The DFS primary server is tr2wcinfmdt03, this is also the server where all MDT clients will report their status for monitoring. You must make sure that the d:\mdt\lii-deploy\control\bootstrap.ini and d:\mdt\lii-deploy\control\customsettings.ini file both contain the gateway to site mapping as well as the deployment root for the site.  This is how we can keep everything centrally maintained, and is critical to the process. 
 
 ### Setup DFS and Deployment Share
 Once the server is online, configure DFS and the deployment share.
@@ -70,10 +71,10 @@ icacls $DeploymentShareNTFS /grant '"Users":(OI)(CI)(RX)'
 icacls $DeploymentShareNTFS /grant '"Administrators":(OI)(CI)(F)'
 icacls $DeploymentShareNTFS /grant '"SYSTEM":(OI)(CI)(F)'
 $domain = 'lii01.livun.com'
-New-DfsReplicationGroup -GroupName lii-deploy -DomainName $domain -Description 'Replication Group for lii-deploy shares' 
-Add-DfsrMember -GroupName lii-deploy -ComputerName tr2wcinfmdt02
-new-dfsreplicatedfolder -GroupName lii-deploy -FolderName lii-deploy -Domain $domain -dfsnpath \\$domain\lii-deploy
-set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName tr2wcinfmdt02 -Contentpath $DeploymentShareNTFS -primarymember $true -StagingPathQuotaInMB 51200000
+New-DfsReplicationGroup -GroupName lii-mdt-deploy -DomainName $domain -Description 'Replication Group for lii-deploy shares' 
+Add-DfsrMember -GroupName lii-mdt-deploy -ComputerName tr2wcinfmdt03
+new-dfsreplicatedfolder -GroupName lii-mdt-deploy -FolderName lii-deploy -Domain $domain -dfsnpath \\$domain\lii-deploy
+set-dfsrmembership -GroupName lii-mdt-deploy -FolderName lii-deploy -ComputerName tr2wcinfmdt03 -Contentpath $DeploymentShareNTFS -primarymember $true -StagingPathQuotaInMB 51200000
 ```
 
 ### Deployment Workbench
@@ -130,10 +131,10 @@ mkdir d:\mdt\lii-deploy
 Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
-add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername
-set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 51200000 -readonly $true -force
-Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername
-$tr2hash = get-dfsrfilehash \\tr2wcinfmdt02\d$\mdt\lii-deploy
+add-dfsrmember -GroupName lii-mdt-deploy -ComputerName $env:computername
+set-dfsrmembership -GroupName lii-mdt-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 51200000 -readonly $true -force
+Add-DfsrConnection -GroupName lii-mdt-deploy -SourceComputerName tr2wcinfmdt03 -DestinationComputerName $env:computername
+$tr2hash = get-dfsrfilehash \\tr2wcinfmdt03\d$\mdt\lii-deploy
 write-host 'sleeping for 10 minutes'
 Start-Sleep -s 600
 Do {
@@ -220,10 +221,10 @@ mkdir d:\mdt\lii-deploy
 Install-WindowsFeature -Name FS-DFS-Replication -IncludeManagementTools
 $DeploymentShareNTFS = "d:\mdt\lii-deploy"
 new-smbshare -Name "lii-deploy$" -path $DeploymentShareNTFS -ChangeAccess "Everyone" -FullAccess "Administrators"
-add-dfsrmember -GroupName lii-deploy -ComputerName $env:computername
-set-dfsrmembership -GroupName lii-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 51200000 -readonly $true -force
-Add-DfsrConnection -GroupName lii-deploy -SourceComputerName tr2wcinfmdt02 -DestinationComputerName $env:computername
-$tr2hash = get-dfsrfilehash \\tr2wcinfmdt02\d$\mdt\lii-deploy
+add-dfsrmember -GroupName lii-mdt-deploy -ComputerName $env:computername
+set-dfsrmembership -GroupName lii-mdt-deploy -FolderName lii-deploy -ComputerName $env:computername -Contentpath d:\mdt\lii-deploy -StagingPathQuotaInMB 51200000 -readonly $true -force
+Add-DfsrConnection -GroupName lii-mdt-deploy -SourceComputerName tr2wcinfmdt03 -DestinationComputerName $env:computername
+$tr2hash = get-dfsrfilehash \\tr2wcinfmdt03\d$\mdt\lii-deploy
 write-host 'sleeping for 10 minutes'
 Start-Sleep -s 600
 Do {
@@ -296,7 +297,7 @@ Import-WdsBootImage -Path D:\mdt\lii-deploy\Boot\LiteTouchPE_x64.wim -NewImageNa
 Once you have finished doing your changes that were required in the LAB, you can replicate to the main DFS share via robocopy, replace TEST001 with whatever tasklist you are currently testing.
 
 ```shell
-robocopy d:\mdt\lii-image \\tr2wcinfmdt02\lii-deploy$ /mir /r:2 /w:1 /xf Bootstrap.ini CustomSettings.ini Audit.log settings.xml /xd DfsrPrivate Boot TEST001
+robocopy d:\mdt\lii-image \\tr2wcinfmdt03\lii-deploy$ /mir /r:2 /w:1 /xf Bootstrap.ini CustomSettings.ini Audit.log settings.xml /xd DfsrPrivate Boot TEST001
 ```
 
 # Appendix
@@ -306,7 +307,7 @@ robocopy d:\mdt\lii-image \\tr2wcinfmdt02\lii-deploy$ /mir /r:2 /w:1 /xf Bootstr
 | **Name** | **Status** | **Notes** |
 |:-----------:|:-----------:|:-----------|
 | 12/07/2021 | v1.0 | John Fogarty  | 
-| TR2WCINFMDT02 | online | new 2022 design | 
+| tr2wcinfmdt03 | online | new 2022 design | 
 | TWMWCINFMDT02 | online | new 2022 design | 
 | AIRWCINFMDT00 | online | legacy 2012 airport road | 
 | AJSWCINFMDT00 | online | ayush remote - will be a DFS-R point in the future | 
